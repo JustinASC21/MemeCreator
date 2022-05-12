@@ -28,6 +28,7 @@ public class Fetch {
             try {
                 HttpResponse<String> response = requestClient.send(req, HttpResponse.BodyHandlers.ofString()); // get response
                 // use Json object to encode to easy to access object
+                client.close(); // close connection
                 JSONObject obj = new JSONObject(); // neecd to convert to json object
                 obj.putAll(response.body());
             }
