@@ -10,22 +10,19 @@ public class FileReadWrite {
 
     public FileReadWrite(String src) {
         f = new File(src);
-        try {
-            f.createNewFile();
-            s = new Scanner(f);
-        }
-        catch (IOException ie) {
-            System.out.println("Can not create file");
-        }
-
-
     }
     public boolean doesExist() {
-        return f.exists();
+        try {
+            s = new Scanner(f);
+            return true;
+        }
+        catch (FileNotFoundException nf) {
+            return false;
+        }
     }
-    public void write(String text) {
-        if (f.canWrite()) {
+    public void fileWrite(String text) {
             try {
+                System.out.println("Write method");
                 FileWriter fWriter = new FileWriter(f.getPath());
                 fWriter.write(text);
                 fWriter.close();
@@ -34,9 +31,8 @@ public class FileReadWrite {
                 System.out.println("Can not create file");
             }
 
-        }
     }
-    public String read() {
+    public String fileRead() {
         if (f.canRead() && s.hasNextLine()) {
             return s.nextLine();
         }
