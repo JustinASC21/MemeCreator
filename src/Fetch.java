@@ -1,10 +1,16 @@
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -80,6 +86,66 @@ public class Fetch {
             }
         }
 
+    }
+    public String postRequest(String memeID,int numBoxes) {
+        // numBoxes refers to text fields for memes
+        JSONArray boxes = new JSONArray();
+        for (int i = 0; i < numBoxes; i ++) { // loop thru how many num boxes there are creating the text
+            JSONObject tempJO = new JSONObject();
+            tempJO.put("text", "sample");
+            tempJO.put("color","#FFFFFF");
+            tempJO.put("outline_color","#000000");
+            boxes.add(tempJO); // add the json object for one box to the array
+        }
+
+        // data to sent with request
+        Map<Object,Object> data = new HashMap<>();
+        data.put("template_id",memeID);
+        data.put("username","JustinLema");
+        data.put("password","tech1234");
+        data.put("boxes",boxes);
+
+
+
+//        try { // trying to get http parameters to send
+//            String urlParameters = "template_id=247375501&username=JustinLema&password=tech1234&boxes=" + boxes.toString();
+//            byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
+//            int postDataLength = postData.length;
+//            String request = apiUrl;
+//            URL url = new URL(request);
+//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//            conn.setDoOutput(true);
+//            conn.setInstanceFollowRedirects(false);
+//            conn.setRequestMethod("POST");
+//            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+//            conn.setRequestProperty("charset", "utf-8");
+//            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+//            conn.setUseCaches(false);
+//            try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+//                wr.write(postData);
+//            }
+//            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+//            StringBuilder sb = new StringBuilder();
+//            String output;
+//            while ((output = br.readLine()) != null) {
+//                sb.append(output);
+//            }
+//            System.out.println(sb.toString());
+        HttpRequest postReq = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+//                .timeout(Duration.ofMinutes(2))
+                .header("Content-Type", "application/json")
+
+                .POST(HttpRequest.BodyPublishers.ofString(boxes.toString()))
+                .build();
+        try { // sends json info, but http parameters needed
+                HttpResponse<String> response = requestClient.send(postReq, HttpResponse.BodyHandlers.ofString());
+                System.out.println("Successful connection");
+                return response.body();
+            } catch (InterruptedException | IOException ie) {
+                System.out.println("Error on sending post request");
+            }
+        return null;
     }
     public JSONObject getResponseArrayAt(int index) {
         return (JSONObject) responseData.get(index);

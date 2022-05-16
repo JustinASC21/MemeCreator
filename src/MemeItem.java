@@ -23,4 +23,7 @@ public class MemeItem {
     public String getName() {
         return name;
     }
+    public long getBoxCount() {
+        return boxCount;
+    }
 }
