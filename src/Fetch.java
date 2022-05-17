@@ -87,61 +87,30 @@ public class Fetch {
         }
 
     }
-    public String postRequest(String memeID,int numBoxes) {
+    public String postRequest(String memeID,int numBoxes,String firstText, String secondText) {
         // numBoxes refers to text fields for memes
-        JSONArray boxes = new JSONArray();
-        for (int i = 0; i < numBoxes; i ++) { // loop thru how many num boxes there are creating the text
-            JSONObject tempJO = new JSONObject();
-            tempJO.put("text", "sample");
-            tempJO.put("color","#FFFFFF");
-            tempJO.put("outline_color","#000000");
-            boxes.add(tempJO); // add the json object for one box to the array
-        }
+        // returns revised image url
 
-        // data to sent with request
-        Map<Object,Object> data = new HashMap<>();
-        data.put("template_id",memeID);
-        data.put("username","JustinLema");
-        data.put("password","tech1234");
-        data.put("boxes",boxes);
-
-
-
-//        try { // trying to get http parameters to send
-//            String urlParameters = "template_id=247375501&username=JustinLema&password=tech1234&boxes=" + boxes.toString();
-//            byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
-//            int postDataLength = postData.length;
-//            String request = apiUrl;
-//            URL url = new URL(request);
-//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//            conn.setDoOutput(true);
-//            conn.setInstanceFollowRedirects(false);
-//            conn.setRequestMethod("POST");
-//            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-//            conn.setRequestProperty("charset", "utf-8");
-//            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
-//            conn.setUseCaches(false);
-//            try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
-//                wr.write(postData);
-//            }
-//            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-//            StringBuilder sb = new StringBuilder();
-//            String output;
-//            while ((output = br.readLine()) != null) {
-//                sb.append(output);
-//            }
-//            System.out.println(sb.toString());
+        // data to send with request
+        String urlReqAppend = "?template_id=" + memeID+ "&username=JustinLema&password=tech1234&text0=" + firstText + "&text1=" + secondText;
         HttpRequest postReq = HttpRequest.newBuilder()
-                .uri(URI.create(apiUrl))
-//                .timeout(Duration.ofMinutes(2))
+                .uri(URI.create(apiUrl + urlReqAppend))
                 .header("Content-Type", "application/json")
-
-                .POST(HttpRequest.BodyPublishers.ofString(boxes.toString()))
+//                .POST(HttpRequest.BodyPublishers.ofString(boxes.toJSONString()))
                 .build();
         try { // sends json info, but http parameters needed
                 HttpResponse<String> response = requestClient.send(postReq, HttpResponse.BodyHandlers.ofString());
                 System.out.println("Successful connection");
-                return response.body();
+                // return the image url
+            try {
+                JSONParser parser = new JSONParser();
+                JSONObject info =(JSONObject) parser.parse(response.body());
+                String imgURL = ((JSONObject) info.get("data")).get("url").toString();
+                return imgURL;
+            }
+            catch (ParseException pe) {
+                System.out.println("Unable to parse information");
+            }
             } catch (InterruptedException | IOException ie) {
                 System.out.println("Error on sending post request");
             }

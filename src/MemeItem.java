@@ -26,4 +26,8 @@ public class MemeItem {
     public long getBoxCount() {
         return boxCount;
     }
+
+    public String getId() {
+        return id;
+    }
 }
