@@ -1,33 +1,28 @@
 import org.json.simple.JSONObject;
 
 public class MemeItem {
-    private String name;
-    private long width;
-    private long height;
-    private String id;
-    private String url;
-    private long boxCount;
+    private JSONObject memeObj;
 
     public MemeItem(JSONObject info) {
-        name = info.get("name").toString();
-        width = (long) info.get("width");
-        url = info.get("url").toString();
-        height = (long) info.get("height");
-        id = info.get("id").toString();
-        boxCount = (long) info.get("box_count");
+        memeObj = info;
     }
-
+    public long getWidth() {
+        return (long) memeObj.get("width");
+    }
+    public long getHeight() {
+        return (long) memeObj.get("height");
+    }
     public String getImageURL() {
-        return url;
+        return memeObj.get("url").toString();
     }
     public String getName() {
-        return name;
+        return memeObj.get("name").toString();
     }
     public long getBoxCount() {
-        return boxCount;
+        return (long) memeObj.get("box_count");
     }
-
     public String getId() {
-        return id;
+        return memeObj.get("id").toString();
     }
+    public JSONObject getMemeObj() { return memeObj; }
 }

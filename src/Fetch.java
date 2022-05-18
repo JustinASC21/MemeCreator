@@ -108,6 +108,9 @@ public class Fetch {
             }
         return null;
     }
+    public int getResponseArraySize() {
+        return responseData.size();
+    }
     public JSONObject getResponseArrayAt(int index) {
         return (JSONObject) responseData.get(index);
     }
