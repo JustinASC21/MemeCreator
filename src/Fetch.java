@@ -17,6 +17,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 public class Fetch {
+    private final String USERNAME = "JustinLema";
+    private final String PASSWORD = "tech1234";
     private String apiUrl;
     private HttpClient requestClient;
     private JSONArray responseData;
@@ -29,7 +31,6 @@ public class Fetch {
 
     public void getRequest() {
         // file object
-        System.out.println("get request called");
         FileReadWrite f = new FileReadWrite("src/data/apiData");
         // check if file with api request data already exists, if not make request and
         // create it
@@ -51,15 +52,9 @@ public class Fetch {
                     // use parser to parse string information into json
                     try {
                         JSONParser parser = new JSONParser();
-                        JSONObject obj = (JSONObject) ((JSONObject) parser.parse(response.body())).get("data"); // json
-                                                                                                                // object
-                                                                                                                // with
-                                                                                                                // meme
-                                                                                                                // key
+                        JSONObject obj = (JSONObject) ((JSONObject) parser.parse(response.body())).get("data"); // json object with meme key
                         responseData = (JSONArray) (obj.get("memes"));
-                        // System.out.println(responseData);
                         f.fileWrite(obj.toString()); // write Json object to file
-                        System.out.println("First time Written to file");
                     } catch (ParseException p) {
                         System.out.println("Data was not able to be retrieved");
                     }
@@ -87,26 +82,23 @@ public class Fetch {
         }
 
     }
-    public String postRequest(String memeID,int numBoxes,String firstText, String secondText) {
+    public String postRequest(String memeID, int numBoxes,String firstText, String secondText) {
         // numBoxes refers to text fields for memes
         // returns revised image url
-
         // data to send with request
-        String urlReqAppend = "?template_id=" + memeID+ "&username=JustinLema&password=tech1234&text0=" + firstText + "&text1=" + secondText;
+        String urlReqAppend = "?template_id=" + memeID+ "&username=JustinLema&password=tech1234&text0=" + parseToParam(firstText) + "&text1=" + parseToParam(secondText);
         HttpRequest postReq = HttpRequest.newBuilder()
                 .uri(URI.create(apiUrl + urlReqAppend))
                 .header("Content-Type", "application/json")
-//                .POST(HttpRequest.BodyPublishers.ofString(boxes.toJSONString()))
                 .build();
         try { // sends json info, but http parameters needed
                 HttpResponse<String> response = requestClient.send(postReq, HttpResponse.BodyHandlers.ofString());
-                System.out.println("Successful connection");
                 // return the image url
             try {
                 JSONParser parser = new JSONParser();
-                JSONObject info =(JSONObject) parser.parse(response.body());
-                String imgURL = ((JSONObject) info.get("data")).get("url").toString();
-                return imgURL;
+                String newMemeURL =((JSONObject) ((JSONObject) parser.parse(response.body())).get("data")).get("url").toString();
+                // String imgURL = ;
+                return newMemeURL;
             }
             catch (ParseException pe) {
                 System.out.println("Unable to parse information");
@@ -119,7 +111,22 @@ public class Fetch {
     public JSONObject getResponseArrayAt(int index) {
         return (JSONObject) responseData.get(index);
     }
+    public String parseToParam(String text) {
+        String newParsedParam = "";
+        for (int i = 0; i < text.length(); i ++) {
+            if (text.substring(i,i+1).equals(" ")) {
+                newParsedParam += "%20";
+            }
+            else {
+                newParsedParam += text.substring(i,i+1);
+            }
+        }
+        return newParsedParam;
+    }
     public String getURL() {
         return apiUrl;
+    }
+    public void setURL(String newURL) {
+        apiUrl = newURL;
     }
 }
