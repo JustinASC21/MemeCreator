@@ -2,6 +2,7 @@ import java.io.File;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Color;
@@ -24,10 +25,8 @@ public class Interface implements ActionListener {
     private JFrame memeSelectionWindow;
     private JFrame memeEditorWindow;
     private JScrollPane memeInfo;
-    private JTextArea textDisplay;
-    private JTextField topCaptionInput;
-    private JTextField bottomCaptionInput;
-    private JTextField textInput;
+    private JTextArea greetingDisplay,textDisplay,memeEditorDisplay;
+    private JTextField topCaptionInput, bottomCaptionInput, memeInput, nameInput;
 
     public Interface() {
         input = new Scanner(System.in);
@@ -53,14 +52,22 @@ public class Interface implements ActionListener {
         memeEditorWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // set up the text input question and input fields
+        Font kanitFont = new Font("Kanit",Font.BOLD,18);
+        greetingDisplay = new JTextArea();
+        greetingDisplay.setFont(kanitFont);
+        greetingDisplay.setEditable(false);
+        greetingDisplay.setText("Welcome, please enter a username so you can store your memes!");
         textDisplay = new JTextArea();
-        textDisplay.setText("Welcome, please enter a username so you can store your memes!");
         textDisplay.setEditable(false);
+        textDisplay.setFont(kanitFont);
+        memeEditorDisplay = new JTextArea();
+        memeEditorDisplay.setEditable(false);
+        memeEditorDisplay.setFont(kanitFont);
 
-        textInput = new JTextField();
+        nameInput = new JTextField();
+        memeInput = new JTextField();
         topCaptionInput = new JTextField();
         bottomCaptionInput = new JTextField();
-
         memeLabel = new JLabel(); // set up meme display image 
         
         setGreetingWindow();
@@ -68,13 +75,10 @@ public class Interface implements ActionListener {
     }
     public void setGreetingWindow() { 
         // add textdisplay and textInput to the greetingWindow with a button to read action
-        JButton submitName = new JButton();
-        submitName.setText("Submit Name");
-        submitName.addActionListener(this); // make the button listen for events
         // add to the greetingWindow
-        greetingWindow.add(textDisplay,BorderLayout.NORTH);
-        greetingWindow.add(textInput,BorderLayout.CENTER); 
-        greetingWindow.add(submitName,BorderLayout.SOUTH);
+        greetingWindow.add(greetingDisplay,BorderLayout.NORTH);
+        greetingWindow.add(nameInput,BorderLayout.CENTER);
+        greetingWindow.add(createButton("Submit Name"),BorderLayout.SOUTH);
 
         // show the frame by compiling it
         greetingWindow.pack();
@@ -82,43 +86,68 @@ public class Interface implements ActionListener {
 
     }
     public void setMemeSelectionWindow() {
-        memeSelectionWindow.setTitle("User: " + user); // update title
+        if (memeSelectionWindow.getTitle().equals("")) {
+            // this means that the program runs this for the first time
+            memeSelectionWindow.setTitle("User: " + user); // update title
 
-         // set up the memeinfo window
-         memeSelectionWindow.add(textDisplay,BorderLayout.NORTH);
-         JPanel memeJPanel = new JPanel();
-         memeJPanel.setLayout(new BoxLayout(memeJPanel, BoxLayout.Y_AXIS)); // set alignment vertically
-         memeJPanel.add(memeInfo); 
-         textInput.setText("");
-         memeJPanel.add(textInput);
-         memeSelectionWindow.add(memeJPanel,BorderLayout.CENTER);
-         JPanel memeSelectionInputPanel = new JPanel(); // panel to store the inputs 
-        
-        //  memeSelectionInputPanel.
-        //  memeSelectionInputPanel.add(textInput);
-         memeSelectionInputPanel.add(createButton("Select Meme"));
-         memeSelectionInputPanel.add(createButton("Change Username"));
-         memeSelectionWindow.add(memeSelectionInputPanel,BorderLayout.SOUTH); // add panel with inputs
-         memeSelectionWindow.pack();
-         memeSelectionWindow.setVisible(true);
+            // set up the memeinfo window
+            memeSelectionWindow.add(textDisplay,BorderLayout.NORTH);
+            JPanel memeJPanel = new JPanel();
+            memeJPanel.setLayout(new BoxLayout(memeJPanel, BoxLayout.Y_AXIS)); // set alignment vertically
+            memeJPanel.add(memeInfo);
+            memeInput.setText("");
+            memeJPanel.add(memeInput);
+            memeSelectionWindow.add(memeJPanel,BorderLayout.CENTER);
+            JPanel memeSelectionInputPanel = new JPanel(); // panel to store the inputs
+
+            //  memeSelectionInputPanel.
+            //  memeSelectionInputPanel.add(textInput);
+            memeSelectionInputPanel.add(createButton("Select Meme"));
+            memeSelectionInputPanel.add(createButton("Change Username"));
+            memeSelectionWindow.add(memeSelectionInputPanel,BorderLayout.SOUTH); // add panel with inputs
+
+            memeSelectionWindow.invalidate();
+            memeSelectionWindow.validate();
+            memeSelectionWindow.repaint();
+            memeSelectionWindow.pack();
+            memeSelectionWindow.setVisible(true);
+            System.out.println("First time creating window");
+        }
+        else {
+            // not the first time because the title of the window has a value
+            memeSelectionWindow.setTitle("User: " + user);
+            memeSelectionWindow.pack();
+            memeSelectionWindow.setVisible(true);
+        }
+
     }
     public void setMemeEditorWindow(int memeIndex) {
-        // change the url to handle post requests
-        apiClient.setURL("https://api.imgflip.com/caption_image");
+        if (memeEditorWindow.getTitle().equals("")) {
+            // first time because title is empty
+            // change the url to handle post requests
+            apiClient.setURL("https://api.imgflip.com/caption_image");
 
-        memeEditorWindow.setTitle("User Editing: " + user); // update title
-         // set up the meme editor window
-         memeEditorWindow.add(textDisplay,BorderLayout.NORTH);
-         setMemeImage(memeCollection.get(memeIndex - 1)); // offset the index
-         memeEditorWindow.add(memeLabel,BorderLayout.CENTER);
-         JPanel editorInputs = new JPanel();
-         editorInputs.setLayout(new BoxLayout(editorInputs, BoxLayout.Y_AXIS)); // set vertical layout
-         editorInputs.add(topCaptionInput);
-         editorInputs.add(bottomCaptionInput);
-         editorInputs.add(createButton("Submit Captions"));
-         memeEditorWindow.add(editorInputs,BorderLayout.SOUTH);
-         memeEditorWindow.pack();
-         memeEditorWindow.setVisible(true);;
+            memeEditorWindow.setTitle("User Editing: " + user); // update title
+            // set up the meme editor window
+            memeEditorWindow.add(memeEditorDisplay,BorderLayout.NORTH);
+            setMemeImage(memeCollection.get(memeIndex - 1)); // offset the index
+            memeEditorWindow.add(memeLabel,BorderLayout.CENTER);
+            JPanel editorInputs = new JPanel();
+            editorInputs.setLayout(new BoxLayout(editorInputs, BoxLayout.Y_AXIS)); // set vertical layout
+            editorInputs.add(topCaptionInput);
+            editorInputs.add(bottomCaptionInput);
+            editorInputs.add(createButton("Submit Captions"));
+            memeEditorWindow.add(editorInputs,BorderLayout.SOUTH);
+            memeEditorWindow.pack();
+            memeEditorWindow.setVisible(true);
+        }
+        else {
+            // update the editor window
+            memeEditorWindow.setTitle("User Editing: " + user);
+            setMemeImage(memeCollection.get(memeIndex - 1));
+            // change location here
+        }
+
     }
        
     public void runInterface() {
@@ -173,9 +202,6 @@ public class Interface implements ActionListener {
         Image scaledImage = imageData.getScaledInstance((int)meme.getWidth(), (int)meme.getHeight(), java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
         image = new ImageIcon(scaledImage);  // transform it back
         memeLabel.setIcon(image);
-        // JLabel welcomeLabel = new JLabel("   Movies Now Playing!");
-        // welcomeLabel.setFont(new Font("Helvetica", Font.BOLD, 20));
-        // welcomeLabel.setForeground(Color.blue);
     }
     public void loadMemes(JTextArea memeList) {
         String displayText = "";
@@ -199,7 +225,7 @@ public class Interface implements ActionListener {
         String buttonName = button.getText(); // returns the label, so can distinguish between buttons
         if (buttonName.equals("Submit Name")) {
             // get user after submission
-            this.user = textInput.getText();
+            this.user = nameInput.getText();
             this.textDisplay.setText("Hello " + this.user + ". Please select from the list of meme templates below by referencing the numbers.\n\nIf you wish to edit a meme already created, please select the same meme template under the same username.");
             greetingWindow.setVisible(false);
             setMemeSelectionWindow();
@@ -207,32 +233,32 @@ public class Interface implements ActionListener {
         if (buttonName.equals("Select Meme")) {
             // get meme selection number from the text input and redirect to meme display page
             try {
-                int memeNumber = Integer.parseInt(textInput.getText());
+                int memeNumber = Integer.parseInt(memeInput.getText());
                 if (memeNumber <= memeCollection.size()) {
                     // integer is within range so selection is ok
-                    memeSelectionWindow.setVisible(false);
                     textDisplay.setText("You can edit the captions here by changing the top caption and bottom caption.\n Make sure to submit the captions!");
                     setMemeEditorWindow(memeNumber);
                 }
                 else {
                     // selection is out of range
-                    textInput.setText("");
+                    textDisplay.setText("");
                     textDisplay.setText("Hello " + this.user + ". Please select from the list of meme templates below by referencing the numbers.\n\nIf you wish to edit a meme already created, please select the same meme template under the same username.\n**Please enter a number within the range available!**");
                     memeSelectionWindow.pack();
                 }
             }
             catch (NumberFormatException nf) {
-                textInput.setText("");
+                memeInput.setText("");
                 textDisplay.setText("Hello " + this.user + ". Please select from the list of meme templates below by referencing the numbers.\n\nIf you wish to edit a meme already created, please select the same meme template under the same username.\n**Please enter a valid number!**");
                 memeSelectionWindow.pack();
             }
         }
         if (buttonName.equals("Change Username")) {
             // redirect to original page with function
-            textDisplay.setText("Welcome, please enter a username so you can store your memes!");
-            memeSelectionWindow.setVisible(false);
-            setGreetingWindow();
+            //            setGreetingWindow();
+            nameInput.setText("");
+            greetingWindow.setVisible(true);
         }
+
         if (buttonName.equals("Submit Captions")) {
             System.out.println("Submitting Captions");
             //api post request here
