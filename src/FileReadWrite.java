@@ -28,7 +28,6 @@ public class FileReadWrite {
 
     public void fileWrite(String text) {
         try {
-            System.out.println("Write method");
             FileWriter fWriter = new FileWriter(f.getPath());
             fWriter.write(text);
             fWriter.close();
