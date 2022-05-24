@@ -1,29 +1,23 @@
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-public class Fetch {
+public class FetchData {
     private final String USERNAME = "JustinLema";
     private final String PASSWORD = "tech1234";
     private String apiUrl;
     private HttpClient requestClient;
     private JSONArray responseData;
 
-    public Fetch(String url) {
+    public FetchData(String url) {
         requestClient = HttpClient.newHttpClient();
         responseData = new JSONArray(); // to store data in json
         apiUrl = url;
@@ -31,19 +25,18 @@ public class Fetch {
 
     public void getRequest() {
         // file object
-        FileReadWrite f = new FileReadWrite("src/data/apiData");
+        FileEditor dataFile = new FileEditor("src/data/apiData");
         // check if file with api request data already exists, if not make request and
         // create it
 
-        if (!f.doesExist()) { // if file does not exists then write a new file
+        if (!dataFile.doesExist()) { // if file does not exists then write a new file
 
             try {
                 // create URI with api url
                 URI urlEncoded = new URI(this.apiUrl);
                 // create a new httpBuilder with URI param to send requests
-                HttpRequest req = HttpRequest.newBuilder(urlEncoded).GET() // set the URI to api URl and set the request
-                                                                           // to GET
-                        .build(); // build request
+                HttpRequest req = HttpRequest.newBuilder(urlEncoded).GET() // set the URI to api URl and set the
+                    .build(); // build request
                 // get response as string with request and client
                 try {
                     HttpResponse<String> response = requestClient.send(req, HttpResponse.BodyHandlers.ofString()); // get
@@ -54,7 +47,7 @@ public class Fetch {
                         JSONParser parser = new JSONParser();
                         JSONObject obj = (JSONObject) ((JSONObject) parser.parse(response.body())).get("data"); // json object with meme key
                         responseData = (JSONArray) (obj.get("memes"));
-                        f.fileWrite(obj.toString()); // write Json object to file
+                        dataFile.fileWrite(obj.toString()); // write Json object to file
                     } catch (ParseException p) {
                         System.out.println("Data was not able to be retrieved");
                     }
@@ -73,7 +66,7 @@ public class Fetch {
             // read off the existing file and set it to response data 
             JSONParser parser = new JSONParser();
             try {
-                JSONObject obj = (JSONObject) parser.parse(f.fileRead());
+                JSONObject obj = (JSONObject) parser.parse(dataFile.fileRead());
                 responseData = (JSONArray) obj.get("memes"); // get array of memes
             }
               catch (ParseException pe) {

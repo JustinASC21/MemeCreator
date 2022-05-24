@@ -1,39 +1,34 @@
-import java.io.File;
-import java.util.Scanner;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import java.awt.BorderLayout;
-import java.awt.Image;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 
-public class Interface implements ActionListener {
+public class MemeGUI implements ActionListener {
     private String user;
     private ArrayList<MemeItem> memeCollection = new ArrayList<MemeItem>();
-    private Fetch apiClient;
-    private FileReadWrite imageWriter;
+    private FetchData apiClient;
+    private FileEditor imageWriter;
+    private Font kanitFont, poppinsFont;
     private JLabel memeLabel;
     private JFrame greetingWindow, memeSelectionWindow, memeEditorWindow;
     private JScrollPane memeInfo;
     private JTextPane greetingDisplay,memeSelectionDisplay,memeEditorDisplay;
     private JTextField topCaptionInput, bottomCaptionInput, memeInput, nameInput;
 
-    public Interface() {
+    public MemeGUI() {
         // make api call before to get data first
-        imageWriter = new FileReadWrite("src/images");
-        apiClient = new Fetch("https://api.imgflip.com/get_memes");
+        imageWriter = new FileEditor("src/images");
+        apiClient = new FetchData("https://api.imgflip.com/get_memes");
         apiClient.getRequest();
 
+        // set up fonts
+        kanitFont = new Font("Kanit",Font.BOLD,20);
+        poppinsFont = new Font("Poppins",Font.ITALIC, 16);
         // set up the windows here
         greetingWindow = new JFrame("Meme Creator");
         greetingWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,6 +40,7 @@ public class Interface implements ActionListener {
     public void runInterface() {
         // displays the acceptable memes in a scroll
         JTextArea memeList = new JTextArea(30,35);
+        memeList.setFont(poppinsFont);
         memeList.setEditable(false); // make it so user cant edit list
         fillMemeCollection(); // fill up with acceptable memes
         loadMemes(memeList); // load to jTextField
@@ -52,7 +48,7 @@ public class Interface implements ActionListener {
         memeInfo = new JScrollPane(memeList);
         memeInfo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         // set up the text input question and input fields
-        Font kanitFont = new Font("Kanit",Font.BOLD,20);
+
         greetingDisplay = new JTextPane();
         greetingDisplay.setFont(kanitFont);
         greetingDisplay.setEditable(false);
@@ -116,8 +112,7 @@ public class Interface implements ActionListener {
             memeSelectionInputPanel.add(createButton("Change Username"));
             memeSelectionWindow.add(memeSelectionInputPanel,BorderLayout.SOUTH); // add panel with inputs
 
-            memeSelectionWindow.invalidate();
-            memeSelectionWindow.validate();
+            memeSelectionWindow.setLocation(0,0);
             memeSelectionWindow.repaint();
             memeSelectionWindow.pack();
             memeSelectionWindow.setVisible(true);
@@ -131,16 +126,19 @@ public class Interface implements ActionListener {
 
     }
     public void setMemeEditorWindow(int memeIndex) {
+        MemeItem meme = memeCollection.get(memeIndex - 1); // get ref to the meme
         if (memeEditorWindow.getTitle().equals("")) {
+
             // first time because title is empty
             // change the url to handle post requests
             apiClient.setURL("https://api.imgflip.com/caption_image");
-
-            memeEditorWindow.setTitle("User Editing Meme #" + memeIndex + ": " + user); // update title
+            memeEditorWindow.setTitle("User Editing '" + meme.getName() +  "' Meme #" + memeIndex + ": " + user); // update title
             // set up the meme editor window
             memeEditorWindow.add(memeEditorDisplay,BorderLayout.NORTH);
-            setMemeImage(memeCollection.get(memeIndex - 1),memeCollection.get(memeIndex - 1).getImageURL()); // offset the index
+            setMemeImage(meme,meme.getImageURL()); // offset the index
             memeEditorWindow.add(memeLabel,BorderLayout.CENTER);
+            JLabel bottomCaptionLabel = new JLabel();
+            bottomCaptionLabel.setText("Bottom Caption: ");
             JPanel editorInputs = new JPanel();
             editorInputs.setLayout(new BoxLayout(editorInputs, BoxLayout.Y_AXIS)); // set vertical layout
             editorInputs.add(topCaptionInput);
@@ -148,13 +146,13 @@ public class Interface implements ActionListener {
             editorInputs.add(createButton("Submit Captions"));
             memeEditorWindow.add(editorInputs,BorderLayout.SOUTH);
             memeEditorWindow.pack();
-            memeEditorWindow.setLocationRelativeTo(memeSelectionWindow);
+            memeEditorWindow.setLocation(memeSelectionWindow.getX() + memeSelectionWindow.getWidth(),0);
             memeEditorWindow.setVisible(true);
         }
         else {
             // update the editor window
-            memeEditorWindow.setTitle("User Editing Meme #" + memeIndex + ": " + user);
-            setMemeImage(memeCollection.get(memeIndex - 1), memeCollection.get(memeIndex - 1).getImageURL());
+            memeEditorWindow.setTitle("User Editing '" + meme.getName() + "' Meme #" + memeIndex + ": " + user);
+            setMemeImage(meme, meme.getImageURL());
             // change location here
         }
 

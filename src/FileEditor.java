@@ -4,22 +4,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import java.net.URL;
-import java.nio.charset.MalformedInputException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
-public class FileReadWrite {
-    private File f;
-    private Scanner s;
+public class FileEditor {
+    private File file;
+    private Scanner scanner;
 
-    public FileReadWrite(String src) {
-        f = new File(src);
+    public FileEditor(String src) {
+        file = new File(src);
     }
 
     public boolean doesExist() {
         try {
-            s = new Scanner(f);
+            scanner = new Scanner(file);
             return true;
         } catch (FileNotFoundException nf) {
             return false;
@@ -28,7 +27,7 @@ public class FileReadWrite {
 
     public void fileWrite(String text) {
         try {
-            FileWriter fWriter = new FileWriter(f.getPath());
+            FileWriter fWriter = new FileWriter(file.getPath());
             fWriter.write(text);
             fWriter.close();
         } catch (IOException i) {
@@ -38,8 +37,8 @@ public class FileReadWrite {
     }
 
     public String fileRead() {
-        if (f.canRead() && s.hasNextLine()) {
-            return s.nextLine();
+        if (file.canRead() && scanner.hasNextLine()) {
+            return scanner.nextLine();
         }
         return null;
     }
@@ -48,19 +47,18 @@ public class FileReadWrite {
         try {
             URL url = new URL(paramURL); // read the url
             BufferedImage image = ImageIO.read(url); // for png
-            ImageIO.write(image, "jpg", new File(f.getPath())); // for jpg
+            ImageIO.write(image, "jpg", new File(file.getPath())); // for jpg
         } catch (IOException e) {
-            System.out.println("Write error for " + f.getPath() +
-                    ": " + e.getMessage());
+            System.out.println("Write error for " + file.getPath() + ": " + e.getMessage());
         }
     }
     public void setSrc(String src) {
-        f = new File(src);
+        file = new File(src);
     }
     public String getSrc() {
-        return f.getPath();
+        return file.getPath();
     }
-    public File getF() {
-        return f;
+    public File getFile() {
+        return file;
     }
 }
