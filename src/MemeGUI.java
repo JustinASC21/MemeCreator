@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -7,7 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Locale;
+
 
 public class MemeGUI implements ActionListener {
     private String user;
@@ -17,7 +16,8 @@ public class MemeGUI implements ActionListener {
     private Font kanitFont, poppinsFont;
     private JLabel memeLabel;
     private JFrame greetingWindow, memeSelectionWindow, memeEditorWindow;
-    private JScrollPane memeInfo;
+    private JTextArea memeList;
+    private JScrollPane memeScrollableInfo;
     private JTextPane greetingDisplay,memeSelectionDisplay,memeEditorDisplay;
     private JTextField topCaptionInput, bottomCaptionInput, memeInput, nameInput;
 
@@ -40,14 +40,14 @@ public class MemeGUI implements ActionListener {
     }
     public void runInterface() {
         // displays the acceptable memes in a scroll
-        JTextArea memeList = new JTextArea(30,35);
+        memeList = new JTextArea(30,35);
         memeList.setFont(poppinsFont);
         memeList.setEditable(false); // make it so user cant edit list
         fillMemeCollection(); // fill up with acceptable memes
         loadMemes(memeList); // load to jTextField
         // create jfield for displaying acceptable memes and make it scrollable
-        memeInfo = new JScrollPane(memeList);
-        memeInfo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        memeScrollableInfo = new JScrollPane(memeList);
+        memeScrollableInfo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         // set up the text input question and input fields
 
         greetingDisplay = new JTextPane();
@@ -97,11 +97,24 @@ public class MemeGUI implements ActionListener {
             // this means that the program runs this for the first time
             memeSelectionWindow.setTitle("User: " + user); // update title
 
-            // set up the memeinfo window
-            memeSelectionWindow.add(memeSelectionDisplay,BorderLayout.NORTH);
+            // set up the memeScrollableInfo window
+            // add panel to filter results
+            JPanel searchPanel = new JPanel();
+            searchPanel.setLayout(new BoxLayout(searchPanel,BoxLayout.X_AXIS));
+            JLabel searchLabel = new JLabel("Search by name: ");
+            searchLabel.setFont(kanitFont);
+            searchPanel.add(searchLabel);
+            JTextField searchInput = new JTextField();
+            searchInput.addActionListener(this);
+            searchPanel.add(searchInput);
+            JPanel topWindowSection = new JPanel();
+            topWindowSection.setLayout(new BoxLayout(topWindowSection, BoxLayout.Y_AXIS));
+            topWindowSection.add(memeSelectionDisplay);
+            topWindowSection.add(searchPanel); // controls the search controls
+            memeSelectionWindow.add(topWindowSection,BorderLayout.NORTH);
             JPanel memeJPanel = new JPanel();
             memeJPanel.setLayout(new BoxLayout(memeJPanel, BoxLayout.Y_AXIS)); // set alignment vertically
-            memeJPanel.add(memeInfo);
+            memeJPanel.add(memeScrollableInfo);
             memeInput.setText("");
             memeJPanel.add(memeInput);
             memeSelectionWindow.add(memeJPanel,BorderLayout.CENTER);
@@ -211,6 +224,18 @@ public class MemeGUI implements ActionListener {
         }
         memeList.setText(displayText);
     }
+    public void loadMemes(String keyword) { // edits the text aread object with new updated infromation
+        String newDisplayText = "";
+        // load memes that match with a specific keyword -> for search function
+        for (int index = 0; index < memeCollection.size();index++) {
+            MemeItem memeAtIndex = memeCollection.get(index);
+            if (memeAtIndex.getName().toLowerCase().indexOf(keyword) != -1) {
+                // this means that keyword is present in meme name
+                newDisplayText += (index + 1) + ". " + memeAtIndex.getName() + "\n";
+            }
+        }
+       memeList.setText(newDisplayText);
+    }
     public void fillMemeCollection() {
         for (int i = 0; i < apiClient.getResponseArraySize(); i++) {
             // loop through all json objects and filter into arraylist only by box counts of 2
@@ -222,7 +247,13 @@ public class MemeGUI implements ActionListener {
         }
     }
     public void actionPerformed(ActionEvent ae) {
-        JButton button = (JButton) ae.getSource();
+        try { // this will only work if the event is from an input, catch statemnet would work for button actions
+            JTextField searchField = (JTextField) ae.getSource();
+            loadMemes(searchField.getText().toLowerCase()); // edits the text list that is stored in the jscroll pane
+            memeSelectionWindow.pack();
+        }
+        catch (ClassCastException ce) {
+            JButton button = (JButton) ae.getSource();
         String buttonName = button.getText(); // returns the label, so can distinguish between buttons
         if (buttonName.equals("Submit Name")) {
             // get user after submission
@@ -283,9 +314,8 @@ public class MemeGUI implements ActionListener {
                     // this also displays image to window
                 }
             }
-
-
-
         }
     }
+        }
+        
 }
