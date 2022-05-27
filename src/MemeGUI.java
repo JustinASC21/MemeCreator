@@ -15,7 +15,9 @@ public class MemeGUI implements ActionListener {
     private FileEditor imageWriter;
     private Font kanitFont, poppinsFont;
     private JLabel memeLabel;
-    private JFrame greetingWindow, memeSelectionWindow, memeEditorWindow;
+    private JFrame greetingWindow;
+    private JFrame memeSelectionWindow;
+    private JFrame memeEditorWindow;
     private JTextArea memeList;
     private JScrollPane memeScrollableInfo;
     private JTextPane greetingDisplay,memeSelectionDisplay,memeEditorDisplay;
@@ -90,7 +92,6 @@ public class MemeGUI implements ActionListener {
         greetingWindow.setSize(800,150);
         greetingWindow.setLocationRelativeTo(memeSelectionWindow);
         greetingWindow.setVisible(true);
-
     }
     public void setMemeSelectionWindow() {
         if (memeSelectionWindow.getTitle().equals("")) {
@@ -105,6 +106,7 @@ public class MemeGUI implements ActionListener {
             searchLabel.setFont(kanitFont);
             searchPanel.add(searchLabel);
             JTextField searchInput = new JTextField();
+            searchInput.setFont(kanitFont);
             searchInput.addActionListener(this);
             searchPanel.add(searchInput);
             JPanel topWindowSection = new JPanel();
@@ -308,7 +310,7 @@ public class MemeGUI implements ActionListener {
                     String title = memeEditorWindow.getTitle();
                     int memeIndex = Integer.parseInt(title.substring(title.indexOf("#") + 1,title.indexOf(":"))) - 1;
                     MemeItem currentMeme = memeCollection.get(memeIndex);
-                    String imageURL = apiClient.postRequest(currentMeme.getId(),(int) currentMeme.getBoxCount(),topText,bottomText);
+                    String imageURL = apiClient.postRequest(currentMeme.getId(),topText,bottomText);
                     setMemeImage(currentMeme,imageURL);
                     // save the image to the images directory with same file name so it will overwrite
                     // this also displays image to window

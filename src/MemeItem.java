@@ -1,7 +1,7 @@
 import org.json.simple.JSONObject;
 
 public class MemeItem {
-    private JSONObject memeObj;
+    private final JSONObject memeObj;
 
     public MemeItem(JSONObject info) {
         memeObj = info;

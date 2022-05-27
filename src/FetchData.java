@@ -14,7 +14,7 @@ public class FetchData {
     private final String USERNAME = "JustinLema";
     private final String PASSWORD = "tech1234";
     private String apiUrl;
-    private HttpClient requestClient;
+    private final HttpClient requestClient;
     private JSONArray responseData;
 
     public FetchData(String url) {
@@ -75,11 +75,11 @@ public class FetchData {
         }
 
     }
-    public String postRequest(String memeID, int numBoxes,String firstText, String secondText) {
+    public String postRequest(String memeID,String firstText, String secondText) {
         // numBoxes refers to text fields for memes
         // returns revised image url
         // data to send with request
-        String urlReqAppend = "?template_id=" + memeID+ "&username=JustinLema&password=tech1234&text0=" + parseToParam(firstText) + "&text1=" + parseToParam(secondText);
+        String urlReqAppend = "?template_id=" + memeID+ "&username=" + USERNAME + "&password=" + PASSWORD + "&text0=" + parseToParam(firstText) + "&text1=" + parseToParam(secondText);
         HttpRequest postReq = HttpRequest.newBuilder()
                 .uri(URI.create(apiUrl + urlReqAppend))
                 .header("Content-Type", "application/json")
@@ -110,7 +110,7 @@ public class FetchData {
     public String parseToParam(String text) {
         String newParsedParam = "";
         for (int i = 0; i < text.length(); i ++) {
-            if (text.substring(i,i+1).equals(" ")) {
+            if (text.charAt(i) == ' ') {
                 newParsedParam += "%20";
             }
             else {

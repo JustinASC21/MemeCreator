@@ -37,8 +37,9 @@ public class FileEditor {
     }
 
     public String fileRead() {
-        if (file.canRead() && scanner.hasNextLine()) {
-            return scanner.nextLine();
+        while (scanner.hasNextLine() && file.canRead()) {
+            String line = scanner.nextLine();
+            if (line.contains("memes")) return line;
         }
         return null;
     }
