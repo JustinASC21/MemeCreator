@@ -39,7 +39,8 @@ public class FileEditor {
     public String fileRead() {
         while (scanner.hasNextLine() && file.canRead()) {
             String line = scanner.nextLine();
-            if (line.contains("memes")) return line;
+            if (line.contains("memes"))
+                return line;
         }
         return null;
     }
@@ -53,12 +54,15 @@ public class FileEditor {
             System.out.println("Write error for " + file.getPath() + ": " + e.getMessage());
         }
     }
+
     public void setSrc(String src) {
         file = new File(src);
     }
+
     public String getSrc() {
         return file.getPath();
     }
+
     public File getFile() {
         return file;
     }
