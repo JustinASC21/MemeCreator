@@ -12,7 +12,8 @@ public class MemeGUI implements ActionListener {
     private ArrayList<MemeItem> memeCollection = new ArrayList<MemeItem>();
     private FetchData apiClient;
     private FileEditor imageWriter;
-    private Font kanitFont, poppinsFont;
+    private final Font KANITFONT = new Font("Kanit",Font.BOLD, 20);
+    private final Font POPPINSFONT = new Font("Poppins", Font.ITALIC, 16);
     private JLabel memeLabel;
     private JFrame greetingWindow;
     private JFrame memeSelectionWindow;
@@ -27,10 +28,7 @@ public class MemeGUI implements ActionListener {
         imageWriter = new FileEditor("src/images");
         apiClient = new FetchData("https://api.imgflip.com/get_memes");
         apiClient.getRequest();
-
-        // set up fonts
-        kanitFont = new Font("Kanit", Font.BOLD, 20);
-        poppinsFont = new Font("Poppins", Font.ITALIC, 16);
+        
         // set up the windows here
         greetingWindow = new JFrame("Meme Creator");
         greetingWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,7 +41,7 @@ public class MemeGUI implements ActionListener {
     public void runInterface() {
         // displays the acceptable memes in a scroll
         memeList = new JTextArea(30, 35);
-        memeList.setFont(poppinsFont);
+        memeList.setFont(POPPINSFONT);
         memeList.setEditable(false); // make it so user cant edit list
         fillMemeCollection(); // fill up with acceptable memes
         loadMemes(memeList); // load to jTextField
@@ -53,15 +51,15 @@ public class MemeGUI implements ActionListener {
         // set up the text input question and input fields
 
         greetingDisplay = new JTextPane();
-        greetingDisplay.setFont(kanitFont);
+        greetingDisplay.setFont(KANITFONT);
         greetingDisplay.setEditable(false);
         greetingDisplay.setText("Welcome, please enter a username so you can store your memes!");
         memeSelectionDisplay = new JTextPane();
         memeSelectionDisplay.setEditable(false);
-        memeSelectionDisplay.setFont(kanitFont);
+        memeSelectionDisplay.setFont(KANITFONT);
         memeEditorDisplay = new JTextPane();
         memeEditorDisplay.setEditable(false);
-        memeEditorDisplay.setFont(kanitFont);
+        memeEditorDisplay.setFont(KANITFONT);
         // center text on all displays
         centerText(greetingDisplay);
         centerText(memeSelectionDisplay);
@@ -71,10 +69,10 @@ public class MemeGUI implements ActionListener {
         memeInput = new JTextField();
         topCaptionInput = new JTextField();
         bottomCaptionInput = new JTextField();
-        nameInput.setFont(kanitFont);
-        memeInput.setFont(kanitFont);
-        topCaptionInput.setFont(kanitFont);
-        bottomCaptionInput.setFont(kanitFont);
+        nameInput.setFont(KANITFONT);
+        memeInput.setFont(KANITFONT);
+        topCaptionInput.setFont(KANITFONT);
+        bottomCaptionInput.setFont(KANITFONT);
         memeLabel = new JLabel(); // set up meme display image
         memeLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -106,10 +104,10 @@ public class MemeGUI implements ActionListener {
             JPanel searchPanel = new JPanel();
             searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
             JLabel searchLabel = new JLabel("Search by name: ");
-            searchLabel.setFont(kanitFont);
+            searchLabel.setFont(KANITFONT);
             searchPanel.add(searchLabel);
             JTextField searchInput = new JTextField();
-            searchInput.setFont(kanitFont);
+            searchInput.setFont(KANITFONT);
             searchInput.addActionListener(this);
             searchPanel.add(searchInput);
             JPanel topWindowSection = new JPanel();
@@ -130,7 +128,7 @@ public class MemeGUI implements ActionListener {
             memeInputPanel.setLayout(new BoxLayout(memeInputPanel, BoxLayout.X_AXIS));
             JLabel memeInputLabel = new JLabel();
             memeInputLabel.setText("Meme Number: ");
-            memeInputLabel.setFont(kanitFont);
+            memeInputLabel.setFont(KANITFONT);
             memeInputPanel.add(memeInputLabel);
             memeInputPanel.add(memeInput);
             memeButtonsPanel.add(createButton("Select Meme"));
@@ -171,8 +169,8 @@ public class MemeGUI implements ActionListener {
             topCaptionPanel.setLayout(new BoxLayout(topCaptionPanel, BoxLayout.X_AXIS));
             JLabel bottomCaptionLabel = new JLabel();
             JLabel topCaptionLabel = new JLabel();
-            bottomCaptionLabel.setFont(kanitFont);
-            topCaptionLabel.setFont(kanitFont);
+            bottomCaptionLabel.setFont(KANITFONT);
+            topCaptionLabel.setFont(KANITFONT);
             bottomCaptionLabel.setText("Bottom Caption: ");
             bottomCaptionLabel.setSize(10, 50);
             topCaptionLabel.setText("Top Caption: ");
@@ -222,8 +220,7 @@ public class MemeGUI implements ActionListener {
         imageWriter.imageSave(imageURL, imgTitle + ".jpg");
         ImageIcon image = new ImageIcon("src/images/" + imgTitle + ".jpg"); // check here * user name may skew
         Image imageData = image.getImage(); // transform it
-        Image scaledImage = imageData.getScaledInstance((int) meme.getWidth(), (int) meme.getHeight(),
-                java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+        Image scaledImage = imageData.getScaledInstance((int) meme.getWidth(), (int) meme.getHeight(), java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
         image = new ImageIcon(scaledImage); // transform it back
         memeLabel.setIcon(image);
     }
@@ -282,7 +279,7 @@ public class MemeGUI implements ActionListener {
                 // page
                 try {
                     int memeNumber = Integer.parseInt(memeInput.getText());
-                    if (memeNumber <= memeCollection.size()) {
+                    if (memeNumber <= memeCollection.size() && memeNumber >= 1) {
                         memeInput.setText("");
                         // integer is within range so selection is ok
                         memeSelectionDisplay.setText("Hello " + this.user

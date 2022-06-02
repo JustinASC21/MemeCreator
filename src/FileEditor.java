@@ -51,7 +51,7 @@ public class FileEditor {
             BufferedImage image = ImageIO.read(url); // for png
             ImageIO.write(image, "jpg", new File(file.getPath())); // for jpg
         } catch (IOException e) {
-            System.out.println("Write error for " + file.getPath() + ": " + e.getMessage());
+            System.out.println("Invalid path due to username");
         }
     }
 
